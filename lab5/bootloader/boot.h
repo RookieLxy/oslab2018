@@ -46,14 +46,14 @@ void waitDisk(void);
 
 void readSect(void *dst, int offset);
 
-void readIde(void *dst, int offset, int n);		// read n bytes from offset bytes in ide 
+void writeSect(void *src, int offset);
 
 uint32_t loader();
 
 /* I/O functions */
 static inline char inByte(short port) {
 	char data;
-	asm volatile("in %1,%0" : "=a" (data) : "d" (port));
+	asm volatile("in %1, %0" : "=a" (data) : "d" (port));
 	return data;
 }
 
@@ -64,7 +64,11 @@ static inline int inLong(short port) {
 }
 
 static inline void outByte(short port, char data) {
-	asm volatile("out %0,%1" : : "a" (data), "d" (port));
+	asm volatile("out %0, %1" : : "a" (data), "d" (port));
+}
+
+static inline void outLong(short port, uint32_t data) {
+	asm volatile("out %0, %1" :: "a"(data), "d"(port));
 }
 
 #endif

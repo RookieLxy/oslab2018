@@ -27,6 +27,23 @@ void readSect(void *dst, int offset) { // reading a sector of disk
 	}
 }
 
+void writeSect(void *src, int offset) { // writing data to a sector
+	int i;
+	waitDisk();
+
+	outByte(0x1F2, 1);
+	outByte(0x1F3, offset);
+	outByte(0x1F4, offset >> 8);
+	outByte(0x1F5, offset >> 16);
+	outByte(0x1F6, (offset >> 24) | 0xE0);
+	outByte(0x1F7, 0x30);
+
+	waitDisk();
+	for(i = 0; i < SECTSIZE/4; ++i) {
+		outLong(0x1F0, ((uint32_t *)src)[i]);
+	}
+}
+
 uint32_t loader() {
 	uint8_t *buf = (uint8_t *)0x1000000;	// a random memory that is 
 											// used as heap, unrecommended

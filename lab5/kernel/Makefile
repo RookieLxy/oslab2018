@@ -14,8 +14,8 @@ KOBJS = $(KCFILES:.c=.o) $(KSFILES:.S=.o)
 kmain.bin: $(KOBJS)
 	$(LD) $(LDFLAGS) -e kEntry -Ttext 0x00100000 -o kMain.elf $(KOBJS)
 	@../utils/genKernel.pl kMain.elf
-	objdump -D kMain.elf > kMain.s
-	readelf -a kMain.elf > kMain.global
+	@objdump -D kMain.elf > kMain.s
+	@readelf -a kMain.elf > kMain.global
 	
 clean:
 	rm -rf $(KOBJS) kMain.elf kMain.bin kMain.s
