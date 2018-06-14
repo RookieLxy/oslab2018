@@ -1,0 +1,140 @@
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Intel 80386
+  Version:                           0x1
+  Entry point address:               0x100000
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          14572 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         3
+  Size of section headers:           40 (bytes)
+  Number of section headers:         10
+  Section header string table index: 7
+
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .text             PROGBITS        00100000 001000 001412 00  AX  0   0  4
+  [ 2] .rodata           PROGBITS        00101412 002412 00005c 01 AMS  0   0  1
+  [ 3] .eh_frame         PROGBITS        00101470 002470 0005b0 00   A  0   0  4
+  [ 4] .data             PROGBITS        00102000 003000 000100 00  WA  0   0 32
+  [ 5] .bss              NOBITS          00102100 003100 201634 00  WA  0   0 32
+  [ 6] .comment          PROGBITS        00000000 003100 000034 01  MS  0   0  1
+  [ 7] .shstrtab         STRTAB          00000000 0038a4 000047 00      0   0  1
+  [ 8] .symtab           SYMTAB          00000000 003134 0004e0 10      9  22  4
+  [ 9] .strtab           STRTAB          00000000 003614 000290 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings)
+  I (info), L (link order), G (group), T (TLS), E (exclude), x (unknown)
+  O (extra OS processing required) o (OS specific), p (processor specific)
+
+There are no section groups in this file.
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x001000 0x00100000 0x00100000 0x01a20 0x01a20 R E 0x1000
+  LOAD           0x003000 0x00102000 0x00102000 0x00100 0x201734 RW  0x1000
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .text .rodata .eh_frame 
+   01     .data .bss 
+   02     
+
+There is no dynamic section in this file.
+
+There are no relocations in this file.
+
+The decoding of unwind sections for machine type Intel 80386 is not currently supported.
+
+Symbol table '.symtab' contains 78 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00100000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00101412     0 SECTION LOCAL  DEFAULT    2 
+     3: 00101470     0 SECTION LOCAL  DEFAULT    3 
+     4: 00102000     0 SECTION LOCAL  DEFAULT    4 
+     5: 00102100     0 SECTION LOCAL  DEFAULT    5 
+     6: 00000000     0 SECTION LOCAL  DEFAULT    6 
+     7: 00000000     0 FILE    LOCAL  DEFAULT  ABS main.c
+     8: 00000000     0 FILE    LOCAL  DEFAULT  ABS irqHandle.c
+     9: 00000000     0 FILE    LOCAL  DEFAULT  ABS idt.c
+    10: 00102108     6 OBJECT  LOCAL  DEFAULT    5 data.1016
+    11: 00000000     0 FILE    LOCAL  DEFAULT  ABS debug.c
+    12: 00000000     0 FILE    LOCAL  DEFAULT  ABS i8259.c
+    13: 00000000     0 FILE    LOCAL  DEFAULT  ABS serial.c
+    14: 00000000     0 FILE    LOCAL  DEFAULT  ABS timer.c
+    15: 00000000     0 FILE    LOCAL  DEFAULT  ABS kvm.c
+    16: 00102110     6 OBJECT  LOCAL  DEFAULT    5 data.1103
+    17: 00000000     0 FILE    LOCAL  DEFAULT  ABS pcb.c
+    18: 0010211c     6 OBJECT  LOCAL  DEFAULT    5 data.1103
+    19: 00000000     0 FILE    LOCAL  DEFAULT  ABS abort.c
+    20: 00102000   256 OBJECT  LOCAL  DEFAULT    4 buf.1226
+    21: 00102124    30 OBJECT  LOCAL  DEFAULT    5 buf.1211
+    22: 00102a20 0x200d00 OBJECT  GLOBAL DEFAULT    5 processTable
+    23: 001006a0   274 FUNC    GLOBAL DEFAULT    1 printf
+    24: 001013db     0 NOTYPE  GLOBAL DEFAULT    1 irqEmpty
+    25: 00100524    42 FUNC    GLOBAL DEFAULT    1 printString
+    26: 001007b4    85 FUNC    GLOBAL DEFAULT    1 initIntr
+    27: 0010090c   377 FUNC    GLOBAL DEFAULT    1 initSeg
+    28: 00100e3c    48 FUNC    GLOBAL DEFAULT    1 addToBlocked
+    29: 00101200   321 FUNC    GLOBAL DEFAULT    1 switchToRunning
+    30: 00100894   117 FUNC    GLOBAL DEFAULT    1 readSect
+    31: 00102960    56 OBJECT  GLOBAL DEFAULT    5 gdt
+    32: 00303720     4 OBJECT  GLOBAL DEFAULT    5 blocked
+    33: 00100124    35 FUNC    GLOBAL DEFAULT    1 sysWrite
+    34: 001011a4    91 FUNC    GLOBAL DEFAULT    1 schedule
+    35: 00101344   151 FUNC    GLOBAL DEFAULT    1 abort
+    36: 00100cd4   357 FUNC    GLOBAL DEFAULT    1 enterProcessSpace
+    37: 00100550   208 FUNC    GLOBAL DEFAULT    1 printDemical
+    38: 001029a0   100 OBJECT  GLOBAL DEFAULT    5 tss
+    39: 00100e9c    93 FUNC    GLOBAL DEFAULT    1 updateTime
+    40: 001001b0   231 FUNC    GLOBAL DEFAULT    1 sysFork
+    41: 001013ee     0 NOTYPE  GLOBAL DEFAULT    1 irqTimer
+    42: 00100ab0   210 FUNC    GLOBAL DEFAULT    1 loadUMain
+    43: 0010084c    27 FUNC    GLOBAL DEFAULT    1 putChar
+    44: 00100b84   326 FUNC    GLOBAL DEFAULT    1 initNewPCB
+    45: 00100ccc     7 FUNC    GLOBAL DEFAULT    1 idle
+    46: 001013e5     0 NOTYPE  GLOBAL DEFAULT    1 irqSyscall
+    47: 00303724     4 OBJECT  GLOBAL DEFAULT    5 current
+    48: 001003ac   152 FUNC    GLOBAL DEFAULT    1 irqHandle
+    49: 0010016c    66 FUNC    GLOBAL DEFAULT    1 timerHandle
+    50: 00102100     4 OBJECT  GLOBAL DEFAULT    5 col
+    51: 0010004c   216 FUNC    GLOBAL DEFAULT    1 fsWrite
+    52: 00102100     0 NOTYPE  GLOBAL DEFAULT    5 __bss_start
+    53: 00100868    24 FUNC    GLOBAL DEFAULT    1 initTimer
+    54: 0010108c   280 FUNC    GLOBAL DEFAULT    1 checkBlockedList
+    55: 00100444   221 FUNC    GLOBAL DEFAULT    1 initIdt
+    56: 00102160  2048 OBJECT  GLOBAL DEFAULT    5 idt
+    57: 00303728     4 OBJECT  GLOBAL DEFAULT    5 runnable
+    58: 00100000    38 FUNC    GLOBAL DEFAULT    1 kEntry
+    59: 00100a88    39 FUNC    GLOBAL DEFAULT    1 enterUserSpace
+    60: 001013e1     0 NOTYPE  GLOBAL DEFAULT    1 irqGProtectFault
+    61: 00100620   126 FUNC    GLOBAL DEFAULT    1 printHex
+    62: 00100efc   398 FUNC    GLOBAL DEFAULT    1 checkRunnableList
+    63: 00100028    35 FUNC    GLOBAL DEFAULT    1 GProtectFaultHandle
+    64: 0030372c     4 OBJECT  GLOBAL DEFAULT    5 erunnable
+    65: 00102100     0 NOTYPE  GLOBAL DEFAULT    4 _edata
+    66: 00303734     0 NOTYPE  GLOBAL DEFAULT    5 _end
+    67: 0010080c    61 FUNC    GLOBAL DEFAULT    1 initSerial
+    68: 00100148    33 FUNC    GLOBAL DEFAULT    1 writeVMem
+    69: 00100e6c    48 FUNC    GLOBAL DEFAULT    1 addToRunnable
+    70: 00303730     4 OBJECT  GLOBAL DEFAULT    5 eblocked
+    71: 001013f4     0 NOTYPE  GLOBAL DEFAULT    1 asmDoIrq
+    72: 00100298   107 FUNC    GLOBAL DEFAULT    1 sysSleep
+    73: 00100304    45 FUNC    GLOBAL DEFAULT    1 sysExit
+    74: 00102118     4 OBJECT  GLOBAL DEFAULT    5 endOfPCB
+    75: 00100880    18 FUNC    GLOBAL DEFAULT    1 waitDisk
+    76: 00100334   120 FUNC    GLOBAL DEFAULT    1 syscallHandle
+    77: 00102104     4 OBJECT  GLOBAL DEFAULT    5 row
+
+No version information found in this file.
