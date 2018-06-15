@@ -1,7 +1,9 @@
-#ifndef __X86_FS__
-#define __X86_FS__
-
-#include "common.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <inttypes.h>
+#include <string.h>
+#include <assert.h>
 
 #define SECTSIZE 512
 #define INODE_SIZE 128
@@ -10,8 +12,11 @@
 #define NR_FCB 16
 #define INODE_TYPE_DIR 0x1
 #define INODE_TYPE_FILE 0x2
-#define FS_START 201
-#define BLOCK_GROUP_SIZE 1024
+#define NR_BOOT 1
+#define NR_KERNEL 200
+#define FS_START (NR_BOOT + NR_KERNEL)
+#define DISK_BLOCK 1024
+#define BLOCK_GROUP_SIZE (DISK_BLOCK - FS_START)
 #define NR_INODE 512
 #define NR_BLOCK 512
 
@@ -19,8 +24,9 @@
 #define GROUP_DESC_SIZE SECTSIZE
 #define DIRENTRY_NAME_LENGTH (DIRENTRY_SIZE - sizeof(uint32_t))
 
-extern uint8_t inodeBitmap[SECTSIZE];
-extern uint8_t blockBitmap[SECTSIZE];
+typedef uint8_t block[SECTSIZE];
+
+extern block disk[BLOCK_GROUP_SIZE]; 
 
 union SuperBlock {
     uint8_t byte[SUPER_SECTSIZE];
@@ -80,5 +86,3 @@ struct FCB {
 };
 
 void initDisk();
-
-#endif
