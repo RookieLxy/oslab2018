@@ -5,7 +5,6 @@
 #include <string.h>
 #include <assert.h>
 
-#define SECTSIZE 512
 #define INODE_SIZE 128
 #define POINTER_NUM 25
 #define DIRENTRY_SIZE 64
@@ -17,13 +16,14 @@
 #define FS_START (NR_BOOT + NR_KERNEL)
 #define DISK_BLOCK 1024
 #define BLOCK_GROUP_SIZE (DISK_BLOCK - FS_START)
+
 #define NR_INODE 512
 #define NR_BLOCK 512
-#define DIRENT_PER_BLOCK (SECTSIZE/DIRENTRY_SIZE)
-
+#define SECTSIZE 512
 #define SUPER_SECTSIZE SECTSIZE
 #define GROUP_DESC_SIZE SECTSIZE
 #define DIRENTRY_NAME_LENGTH (DIRENTRY_SIZE - sizeof(uint32_t))
+#define DIRENT_PER_BLOCK (SECTSIZE/DIRENTRY_SIZE)
 
 typedef uint8_t block[SECTSIZE];
 
@@ -91,12 +91,20 @@ extern union Inode *inodeTable;
 extern uint8_t *inodeBitmap;
 extern uint8_t *blockBitmap;
 extern block *data;
+extern struct FCB fcbTable[NR_FCB];
 
 void initDisk();
 void mkdir(const char *dirName);
 int findFile(const char *fileName);
 void splitFileName(const char *str, char *path, char *fileName);
 void ls(const char *dirName);
-void openFile(const char *fileName);
+int mkfile(const char *fileName);
 int applyNewInode();
 int applyNewBlock();
+int applyNewFCB();
+void initFcbTable();
+int open(const char *fileName, int priority);
+void lseek(int fd, int offset, int whence);
+int read(int fd, void *buffer, int size);
+int write(int fd, void *buffer, int size);
+void close(int fd);

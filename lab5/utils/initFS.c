@@ -6,6 +6,7 @@ union Inode *inodeTable;
 uint8_t *inodeBitmap;
 uint8_t *blockBitmap;
 block *data;
+struct FCB fcbTable[NR_FCB];
 
 int main() {
     memset(disk, 0, BLOCK_GROUP_SIZE*sizeof(block));
@@ -37,18 +38,29 @@ int main() {
     printf("read %d block from app/uMain.elf\n", appSize);
 
     initDisk();
+    initFcbTable();
     mkdir("/sbin");
     mkdir("/dev");
     mkdir("/usr");
-    openFile("/sbin/uMain.elf");
-    openFile("/dev/stdin");
-    openFile("/dev/stdout");
-    openFile("/dev/stderr");
-    openFile("/usr/test");
-    ls("/");
-    ls("/sbin");
-    ls("/dev");
-    ls("/usr");
+    mkfile("/dev/stdin");
+    mkfile("/dev/stdout");
+    int fd = open("/usr/test", 0);  // 创建文件"/usr/test"
+    for(int i = 0; i < 512; ++i) {               // 向"/usr/test"文件中写入字母表
+        char tmp = (char)(i % 26 + 'A');
+        write(fd, (uint8_t*)&tmp, 1);
+    }
+    close(fd);
+    char temp[512];
+    fd = open("/usr/test", 0);
+    read(fd, temp, 512);
+    for(int i = 0; i < 512; ++i) {
+        printf("%c", temp[i]);
+    }
+    printf("\n");
+    //ls("/");
+    //ls("/sbin");
+    //ls("/dev");
+    //ls("/usr");
 
     fclose(fp);
     
@@ -177,10 +189,13 @@ int findFile(const char *fileName) {
     }
 
     assert(fileName[0] == '/');
+    if(fileName[1] == '\0') {
+        return 0;
+    }
     char temp[50];
     strcpy(temp, fileName);
 
-    int inodeIdx = 0;
+    int inodeIdx = -1;
     char *ptr = strtok(&temp[1], "/");
     int find = 0;
     while(ptr != NULL) {
@@ -197,11 +212,11 @@ int findFile(const char *fileName) {
                 }
                 --size;
                 if(size == 0) {
-                    printf("file not found\n");
-                    assert(0);
+                    //printf("file not found\n");
+                    break;
                 }
             }
-            if(find == 1) {
+            if(find == 1 || size == 0) {
                 break;
             }
         }
@@ -234,7 +249,7 @@ void ls(const char *dirName) {
     }
 }
 
-void openFile(const char *fileName) {
+int mkfile(const char *fileName) {
     assert(fileName[0] != '\0');
     
     char file[50];
@@ -265,6 +280,8 @@ void openFile(const char *fileName) {
     strcpy(dirEntry[dirIdx].name, file);
     dirEntry[dirIdx].inode = newInode;
     ++pInode->size;
+
+    return newInode;
 }
 
 int applyNewInode() {
@@ -287,4 +304,146 @@ int applyNewBlock() {
             return i;
         }
     }
+    printf("no empty block\n");
+    assert(0);
+}
+
+int appleNewFCB() {
+    for(int i = 0; i < NR_FCB; ++i) {
+        if(fcbTable[i].isFree == 1) {
+            fcbTable[i].isFree = 0;
+            return i;
+        }
+    }
+    printf("no empty FCB\n");
+    assert(0);
+}
+
+void initFcbTable() {
+    for(int i = 0; i < NR_FCB; ++i) {
+        fcbTable[i].isFree = 1;
+        fcbTable[i].inode = -1;
+        fcbTable[i].offset = 0;
+    }
+}
+
+int open(const char *fileName, int priority) {
+    int inode = findFile(fileName);
+    if(inode == -1) {
+        inode = mkfile(fileName);
+    }
+    int fcbIdx = appleNewFCB();
+    struct FCB *fcb = &fcbTable[fcbIdx];
+    fcb->isFree = 0;
+    fcb->offset = 0;
+    fcb->inode = inode;
+
+    return fcbIdx;
+}
+
+void lseek(int fd, int offset, int whence) {
+    int inode = fcbTable[fd].inode;
+    int size = inodeTable[inode].size;
+    switch(whence) {
+        case SEEK_SET: fcbTable[fd].offset = offset; break;
+        case SEEK_CUR: fcbTable[fd].offset += offset; break;
+        case SEEK_END: fcbTable[fd].offset = size - offset; break;
+        default: assert(0);
+    }
+}
+
+void close(int fd) {
+    fcbTable[fd].isFree = 1;
+    fcbTable[fd].inode = -1;
+    fcbTable[fd].offset = 0;
+}
+
+int read(int fd, void *buffer, int size) {
+    int inode = fcbTable[fd].inode;
+    int offset = fcbTable[fd].offset;
+    int fileSz = inodeTable[inode].size;
+    if(offset + size > fileSz) {
+        size = fileSz - offset;
+    }
+
+    if(offset/SECTSIZE == (offset + size)/SECTSIZE) {
+        int blockIdx = inodeTable[inode].pointer[offset/SECTSIZE];
+        memcpy(buffer, (uint8_t *)&data[blockIdx] + offset%SECTSIZE, size);
+    } else {    
+        uint8_t *ptr = (char *)buffer;
+        int len = size;
+
+        int first = SECTSIZE - offset%SECTSIZE;
+        int pointerIdx = offset/SECTSIZE;
+        int firstBlockIdx = inodeTable[inode].pointer[pointerIdx];
+        memcpy(ptr, (uint8_t *)&data[firstBlockIdx] + offset%SECTSIZE, first);
+        ptr += first;
+        len -= first;
+        ++pointerIdx;
+        fcbTable[fd].offset += first;
+        
+        while(len > SECTSIZE) {
+            int blockIdx = inodeTable[inode].pointer[pointerIdx];
+            memcpy(ptr, (uint8_t *)&data[blockIdx], SECTSIZE);
+            ptr += SECTSIZE;
+            len -= SECTSIZE;
+            ++pointerIdx;
+            fcbTable[fd].offset += SECTSIZE;
+        }
+
+        int lastBlockIdx = inodeTable[inode].pointer[pointerIdx];
+        memcpy(ptr, (uint8_t *)&data[lastBlockIdx], len);
+        fcbTable[fd].offset += len;
+    }
+
+    return size;
+}
+
+int write(int fd, void *buffer, int size) {
+    int inode = fcbTable[fd].inode;
+    int offset = fcbTable[fd].offset;
+    if(offset + size > POINTER_NUM*SECTSIZE) {
+        size = POINTER_NUM*SECTSIZE - offset;
+    }
+
+    if(offset + size > inodeTable[inode].size) {
+        inodeTable[inode].size = offset + size;
+        for(int i = 0; i <= (offset + size)/SECTSIZE; ++i) {
+            if(inodeTable[inode].pointer[i] == -1) {
+                inodeTable[inode].pointer[i] = applyNewBlock();
+            }
+        }
+    }
+
+    if(offset/SECTSIZE == (offset + size)/SECTSIZE) {
+        int blockIdx = inodeTable[inode].pointer[offset/SECTSIZE];
+        memcpy((uint8_t *)&data[blockIdx] + offset%SECTSIZE, buffer, size);
+        fcbTable[fd].offset += size;
+    } else {
+        uint8_t *ptr = buffer;
+        int len = size;
+
+        int first = SECTSIZE - offset%SECTSIZE;
+        int pointerIdx = offset/SECTSIZE;
+        int firstBlockIdx = inodeTable[inode].pointer[pointerIdx];
+        memcpy((uint8_t *)&data[firstBlockIdx] + offset%SECTSIZE, ptr, first);
+        ptr += first;
+        len -= first;
+        ++pointerIdx;
+        fcbTable[fd].offset += first;
+
+        while(len > SECTSIZE) {
+            int blockIdx = inodeTable[inode].pointer[pointerIdx];
+            memcpy((uint8_t *)&data[blockIdx], ptr, SECTSIZE);
+            ptr += SECTSIZE;
+            len -= SECTSIZE;
+            ++pointerIdx;
+            fcbTable[fd].offset += SECTSIZE;
+        }
+
+        int lastBlockIdx = inodeTable[inode].pointer[pointerIdx];
+        memcpy((uint8_t *)&data[lastBlockIdx], ptr, len);
+        fcbTable[fd].offset += len;
+    }
+    return size;
 }
