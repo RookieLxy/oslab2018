@@ -19,6 +19,7 @@
 #define BLOCK_GROUP_SIZE (DISK_BLOCK - FS_START)
 #define NR_INODE 512
 #define NR_BLOCK 512
+#define DIRENT_PER_BLOCK (SECTSIZE/DIRENTRY_SIZE)
 
 #define SUPER_SECTSIZE SECTSIZE
 #define GROUP_DESC_SIZE SECTSIZE
@@ -26,7 +27,6 @@
 
 typedef uint8_t block[SECTSIZE];
 
-extern block disk[BLOCK_GROUP_SIZE]; 
 
 union SuperBlock {
     uint8_t byte[SUPER_SECTSIZE];
@@ -85,4 +85,18 @@ struct FCB {
     int inode;
 };
 
+extern block disk[BLOCK_GROUP_SIZE]; 
+extern union SuperBlock *super;
+extern union Inode *inodeTable;
+extern uint8_t *inodeBitmap;
+extern uint8_t *blockBitmap;
+extern block *data;
+
 void initDisk();
+void mkdir(const char *dirName);
+int findFile(const char *fileName);
+void splitFileName(const char *str, char *path, char *fileName);
+void ls(const char *dirName);
+void openFile(const char *fileName);
+int applyNewInode();
+int applyNewBlock();
