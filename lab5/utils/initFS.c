@@ -44,6 +44,8 @@ int main() {
     mkdir("/usr");
     mkfile("/dev/stdin");
     mkfile("/dev/stdout");
+    ls("/sbin");
+    /*
     int fd = open("/usr/test", 0);  // 创建文件"/usr/test"
     for(int i = 0; i < 512; ++i) {               // 向"/usr/test"文件中写入字母表
         char tmp = (char)(i % 26 + 'A');
@@ -57,11 +59,19 @@ int main() {
         printf("%c", temp[i]);
     }
     printf("\n");
-    //ls("/");
-    //ls("/sbin");
-    //ls("/dev");
-    //ls("/usr");
-
+    */
+    int fd = open("/sbin/init", 0);
+    write(fd, appBuf, appSize*sizeof(block));
+    close(fd);
+    fd = open("/sbin/init", 0);
+    block *appBuf2 = (block *)malloc(appSize*sizeof(block));
+    read(fd, appBuf2, appSize*sizeof(block));
+    for(int i = 0; i < appSize; ++i) {
+        for(int j = 0; j < sizeof(block); ++j) {
+            assert(appBuf[i][j] == appBuf2[i][j]);
+        }
+    }
+    ls("/sbin");
     fclose(fp);
     
     return 0;
@@ -197,7 +207,7 @@ int findFile(const char *fileName) {
 
     int inodeIdx = -1;
     char *ptr = strtok(&temp[1], "/");
-    int find = 0;
+    int fail = 0, find = 0;
     while(ptr != NULL) {
         union Inode *pInode = &inodeTable[inodeIdx];
         int size = pInode->size;
@@ -212,17 +222,22 @@ int findFile(const char *fileName) {
                 }
                 --size;
                 if(size == 0) {
+                    fail = 1;
                     //printf("file not found\n");
                     break;
                 }
             }
-            if(find == 1 || size == 0) {
+            if(fail == 1 || find == 1) {
                 break;
             }
         }
         ptr = strtok(NULL, "/");
     }
-    return inodeIdx;
+    if(fail == 1) {
+        return -1;
+    } else {
+        return inodeIdx;
+    }
 }
 
 void ls(const char *dirName) {
