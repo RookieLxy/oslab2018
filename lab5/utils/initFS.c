@@ -44,7 +44,6 @@ int main() {
     mkdir("/usr");
     mkfile("/dev/stdin");
     mkfile("/dev/stdout");
-    ls("/sbin");
     /*
     int fd = open("/usr/test", 0);  // 创建文件"/usr/test"
     for(int i = 0; i < 512; ++i) {               // 向"/usr/test"文件中写入字母表
@@ -60,9 +59,11 @@ int main() {
     }
     printf("\n");
     */
+    
     int fd = open("/sbin/init", 0);
     write(fd, appBuf, appSize*sizeof(block));
     close(fd);
+    /*
     fd = open("/sbin/init", 0);
     block *appBuf2 = (block *)malloc(appSize*sizeof(block));
     read(fd, appBuf2, appSize*sizeof(block));
@@ -71,7 +72,15 @@ int main() {
             assert(appBuf[i][j] == appBuf2[i][j]);
         }
     }
+    */
+    
+    ls("/");
     ls("/sbin");
+    ls("/dev");
+    ls("/usr");
+    
+    fp = fopen("os.img", "wb");
+    fwrite(disk, sizeof(block), DISK_BLOCK, fp);
     fclose(fp);
     
     return 0;
