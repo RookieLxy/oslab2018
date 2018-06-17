@@ -17,7 +17,7 @@ int main() {
     }
     block *bootBuf = &disk[0];
     int bootSize = fread(bootBuf, sizeof(block), NR_BOOT, fp);
-    printf("read %d block from bootloader/bootloader/bin\n", bootSize);
+    //printf("read %d block from bootloader/bootloader/bin\n", bootSize);
     
     fp = fopen("kernel/kMain.elf", "rb");
     if(fp == NULL) {
@@ -26,7 +26,7 @@ int main() {
     }
     block *kernelBuf = &disk[NR_BOOT];
     int kernelSize = fread(kernelBuf, sizeof(block), NR_KERNEL, fp);
-    printf("read %d block from kernel/kMain.elf\n", kernelSize);
+    //printf("read %d block from kernel/kMain.elf\n", kernelSize);
 
     fp = fopen("app/uMain.elf", "rb");
     if(fp == NULL) {
@@ -35,7 +35,7 @@ int main() {
     }
     block *appBuf = (block *)malloc(200*sizeof(block));
     int appSize = fread(appBuf, sizeof(block), 200, fp);
-    printf("read %d block from app/uMain.elf\n", appSize);
+    //printf("read %d block from app/uMain.elf\n", appSize);
 
     initDisk();
     initFcbTable();
@@ -69,15 +69,11 @@ int main() {
     read(fd, appBuf2, appSize*sizeof(block));
     for(int i = 0; i < appSize; ++i) {
         for(int j = 0; j < sizeof(block); ++j) {
-            assert(appBuf[i][j] == appBuf2[i][j]);
+            printf("%x", appBuf2[i][j]);
         }
+        printf("\n");
     }
     */
-    
-    ls("/");
-    ls("/sbin");
-    ls("/dev");
-    ls("/usr");
     
     fp = fopen("os.img", "wb");
     fwrite(disk, sizeof(block), DISK_BLOCK, fp);
@@ -139,6 +135,7 @@ void initDisk() {
 }
 
 void mkdir(const char *dirName) {
+    //printf("make directory: %s\n", dirName);
     assert(dirName[0] != '\0');
     
     char fileName[50];
@@ -150,6 +147,7 @@ void mkdir(const char *dirName) {
     int newInode = applyNewInode();
     --super->availInodeNum;
     int newBlock = applyNewBlock();
+    //printf("apply block: %d\n", newBlock);
     --super->availBlockNum;
     union Inode *pInode = &inodeTable[newInode];
     
@@ -215,7 +213,7 @@ int findFile(const char *fileName) {
     strcpy(temp, fileName);
 
     int inodeIdx = -1;
-    char *ptr = strtok(&temp[1], "/");
+    char *ptr = strtok(temp, "/");
     int fail = 0, find = 0;
     while(ptr != NULL) {
         union Inode *pInode = &inodeTable[inodeIdx];
@@ -275,6 +273,7 @@ void ls(const char *dirName) {
 
 int mkfile(const char *fileName) {
     assert(fileName[0] != '\0');
+    //printf("make file: %s\n", fileName);
     
     char file[50];
     char path[50];
@@ -325,6 +324,7 @@ int applyNewBlock() {
         if(blockBitmap[i] == 0) {
             --super->availBlockNum;
             blockBitmap[i] = 1;
+            //printf("new block: %d\n", i);
             return i;
         }
     }
@@ -432,6 +432,8 @@ int write(int fd, void *buffer, int size) {
 
     if(offset + size > inodeTable[inode].size) {
         inodeTable[inode].size = offset + size;
+        //printf("inode: %d\n", inode);
+        //printf("size: %d\n", inodeTable[inode].size);
         for(int i = 0; i <= (offset + size)/SECTSIZE; ++i) {
             if(inodeTable[inode].pointer[i] == -1) {
                 inodeTable[inode].pointer[i] = applyNewBlock();

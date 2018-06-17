@@ -1,40 +1,5 @@
 #include "debug.h"
 
-void printf(const char *format,...) {
-	if(format == NULL) {
-		return;
-	}
-	
-	va_list vl;
-	va_start(vl, format);
-
-	char buf[200];
-	char *bufp = buf;
-	int tail = 0;
-
-	while(format[tail] != '\0') {
-		bufp = buf;
-		while(format[tail] != '%' && format[tail] != '\0') {
-			*bufp = format[tail];
-            putChar(*bufp);
-        	++bufp;
-			++tail;
-		}
-		if(format[tail] == '\0') {
-			break;
-		}
-		++tail;
-		switch(format[tail]) {
-			case 'c': putChar(va_arg(vl, int)); break;
-			case 'd': printDemical(va_arg(vl, int)); break;
-			case 'x': printHex(va_arg(vl, int)); break;
-			case 's': printString(va_arg(vl, char*)); break; 
-		}
-		++tail;
-	}
-	va_end(vl);
-}
-
 void printString(char *str) {
 	int len = 0;
 	while(str[len] != '\0') {
@@ -44,7 +9,6 @@ void printString(char *str) {
 }
 
 void printDemical(int d) {
-	putChar((char)(d + '0'));
 	if(d == 0x80000000) {
 		printString("-2147483748");
 		return;

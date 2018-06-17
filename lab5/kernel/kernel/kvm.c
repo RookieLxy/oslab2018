@@ -1,7 +1,6 @@
 #include "x86.h"
 #include "device.h"
 #include "debug.h"
-#include <string.h>
 
 SegDesc gdt[NR_SEGMENTS];
 TSS tss;
@@ -29,6 +28,23 @@ void readSect(void *dst, int offset) {
 	waitDisk();
 	for (i = 0; i < SECTSIZE / 4; i ++) {
 		((int *)dst)[i] = inLong(0x1F0);
+	}
+}
+
+void writeSect(void *src, int offset) { // writing data to a sector
+	int i;
+	waitDisk();
+
+	outByte(0x1F2, 1);
+	outByte(0x1F3, offset);
+	outByte(0x1F4, offset >> 8);
+	outByte(0x1F5, offset >> 16);
+	outByte(0x1F6, (offset >> 24) | 0xE0);
+	outByte(0x1F7, 0x30);
+
+	waitDisk();
+	for(i = 0; i < SECTSIZE/4; ++i) {
+		outLong(0x1F0, ((uint32_t *)src)[i]);
 	}
 }
 
@@ -85,12 +101,17 @@ void enterUserSpace(uint32_t entry) {
 void loadUMain(void) {
 	/*加载用户程序至内存*/
 	uint8_t *buf = (uint8_t *)0x2000000; // 0x2000000 is used as temperarory heap,
-										 // may cause trouble, unrecommended.
+	
+	/*									 // may cause trouble, unrecommended.
 	uint8_t *p = buf;
 	for(int i = 0; i < NR_UELF_SECT; ++i) {
 		readSect((void *)p, UELF_START + i);
 		p += SECTSIZE;
 	}
+	*/
+	initFS();
+	int fd = open("/sbin/init", 0);
+	read(fd, buf, NR_UELF_SECT*sizeof(block));
 
 	struct ELFHeader *elf = (struct ELFHeader *)buf;
 	struct ProgramHeader *ph = (struct ProgramHeader *)(buf + elf->phoff);
@@ -103,8 +124,7 @@ void loadUMain(void) {
 	}
 	
 	//enterUserSpace(elf->entry);
-	
-	initNewPCB();
+
 	uint32_t idx = initNewPCB();
 	current = &processTable[idx];
 	current->state = RUNNING;

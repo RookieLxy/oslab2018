@@ -11,6 +11,11 @@
 #define SYS_sem_post 6
 #define SYS_sem_wait 7
 #define SYS_sem_destroy 8
+#define SYS_LS 9
+#define SYS_OPEN 10
+#define SYS_FWRITE 11
+#define SYS_CAT 12
+#define SYS_CLOSE 13
 #define LINE 80
 
 int row = 0, col = 0;
@@ -31,6 +36,12 @@ void sysSemInit(struct TrapFrame *tf);
 void sysSemPost(struct TrapFrame *tf);
 void sysSemWait(struct TrapFrame *tf);
 void sysSemDestroy(struct TrapFrame *tf);
+
+void sysList(struct TrapFrame *tf);
+void sysOpen(struct TrapFrame *tf);
+void sysFwrite(struct TrapFrame *tf);
+void sysCat(struct TrapFrame *tf);
+void sysClose(struct TrapFrame *tf);
 
 void irqHandle(struct TrapFrame *tf) {
 	/*
@@ -57,7 +68,7 @@ void irqHandle(struct TrapFrame *tf) {
 			syscallHandle(tf);
 			break;
 		default: 
-			printf("error irq\n");
+			printString("error irq\n");
 			assert(0);
 	}
 	enableInterrupt();
@@ -74,26 +85,31 @@ void syscallHandle(struct TrapFrame *tf) {
 		case SYS_sem_init: sysSemInit(tf); break;
 		case SYS_sem_post: sysSemPost(tf); break;
 		case SYS_sem_wait: sysSemWait(tf); break;
-		case SYS_sem_destroy: sysSemDestroy(tf); break; 
+		case SYS_sem_destroy: sysSemDestroy(tf); break;
+		case SYS_LS: sysList(tf); break;
+		case SYS_OPEN: sysOpen(tf); break;
+		case SYS_FWRITE: sysFwrite(tf); break;
+		case SYS_CAT: sysCat(tf); break;
+		case SYS_CLOSE: sysClose(tf); break;
 		default: assert(0);
 	}
 }
 
 void GProtectFaultHandle(struct TrapFrame *tf){
-	printf("GProtextFaultHandle\n");
+	printString("GProtextFaultHandle\n");
 	assert(0);
 	return;
 }
 
 void sysWrite(struct TrapFrame *tf) {
-	tf->eax = fsWrite(tf->ebx, (void *)tf->ecx, tf->edx);
+	void *buf = (char *)((uint32_t)tf->ecx + PROC_K_START(current));
+	tf->eax = fsWrite(tf->ebx, buf, tf->edx);
 }
 
 int fsWrite(int fd, void *buf, uint32_t len) {
 	uint32_t retLen = len;
 		
 	if(fd <= 2) {
-		buf = (char *)((uint32_t)buf + PROC_K_START(current));
 		for(int i = 0; i < len; ++i) {
 			char ch = ((char *)buf)[i];
 			//putChar(ch);
@@ -120,7 +136,7 @@ void writeVMem(char ch, int row, int col) {
 }
 
 void timerHandle(struct TrapFrame *tf) {
-	printf("-");
+	//printString("-");
 	updateTime();
 	checkBlockedList();
 	if(current->state == RUNNING) {
@@ -134,7 +150,7 @@ void timerHandle(struct TrapFrame *tf) {
 }
 
 void sysFork(struct TrapFrame *tf) {
-	printf("fork ");
+	printString("fork ");
 	uint32_t idx = initNewPCB();
 	memcpy((void *)&processTable[idx].stack, (void *)&current->stack, KERNEL_STACK_SIZE);
 	memcpy((void *)&current->sf, (void *)tf, sizeof(struct StackFrame));
@@ -148,7 +164,7 @@ void sysFork(struct TrapFrame *tf) {
 }
 
 void sysSleep(struct TrapFrame *tf) {
-	printf("sleep ");
+	printString("sleep ");
 	memcpy((void *)&current->sf, (void *)tf, sizeof(struct StackFrame));
 	current->state = BLOCKED;
 	current->timeCount = 0;
@@ -160,7 +176,7 @@ void sysSleep(struct TrapFrame *tf) {
 }
 
 void sysExit(struct TrapFrame *tf) {
-	printf("exit ");
+	//printString("exit ");
 	current->state = DEAD;
 	schedule();
 	switchToRunning();
@@ -219,4 +235,45 @@ void sysSemDestroy(struct TrapFrame *tf) {
 	}
 	tf->eax = -1;
 	assert(0);
+}
+
+void sysList(struct TrapFrame *tf) {
+	char *dirName = (char *)((uint32_t)tf->ebx + PROC_K_START(current));
+	ls(dirName);
+}
+
+void kernelPrint(char *str) {
+	int i = 0;
+	while(str[i] != '\0') {
+		++i;
+	}
+	fsWrite(2, (void *)str, i);
+}
+
+void kernelPrintN(char *str, int n) {
+	fsWrite(2, (void *)str, n);
+}
+
+void sysOpen(struct TrapFrame *tf) {
+	char *fileName = (char *)((uint32_t)tf->ebx + PROC_K_START(current));
+	int priority = tf->ecx;
+	tf->eax = open(fileName, priority); 
+}
+
+void sysFwrite(struct TrapFrame *tf) {
+	int fd = tf->ebx;
+	void *src = (void *)((uint32_t)tf->ecx + PROC_K_START(current));
+	//putChar(*(char *)src);
+	int size = tf->edx;
+	tf->eax = write(fd, src, size);
+}
+
+void sysCat(struct TrapFrame *tf) {
+	char *dirName = (char *)((uint32_t)tf->ebx + PROC_K_START(current));
+	cat(dirName);
+}
+
+void sysClose(struct TrapFrame *tf) {
+	int fd = tf->ebx;
+	close(fd);
 }

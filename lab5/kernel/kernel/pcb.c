@@ -1,7 +1,6 @@
 #include "x86.h"
 #include "device.h"
 #include "debug.h"
-#include <string.h>
 
 struct ProcessControlBlock processTable[NR_PCB];
 
@@ -146,7 +145,7 @@ void checkRunnableList() {
 void checkBlockedList() {
 	while(blocked->state == RUNNABLE || blocked->state == DEAD) {
         if(blocked->state == RUNNABLE) {
-            printf("wake ");
+            printString("wake ");
 		    addToRunnable(blocked);
         }
 		blocked = blocked->next;
@@ -160,7 +159,7 @@ void checkBlockedList() {
 	while(q != NULL) {
 		if(q->state == RUNNABLE || q->state == DEAD) {
 			if(q->state == RUNNABLE) {
-                printf("wake ");
+                printString("wake ");
                 addToRunnable(q);
             }
 			q = q->next;
@@ -191,7 +190,7 @@ void schedule() {
 }
 
 void switchToRunning() {
-    printf("switch ");
+    printString("switch ");
     tss.ss0 = KSEL(SEG_KSTACK);
     tss.esp0 = current->stackTop;
 

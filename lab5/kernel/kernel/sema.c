@@ -47,7 +47,7 @@ void P(struct Semaphore *s) {
             p->next = current;
             current->next = NULL;
         }
-        printf("Sema blocked ");
+        printString("Sema blocked ");
         schedule();
         switchToRunning();
     }
@@ -64,7 +64,7 @@ void V(struct Semaphore *s) {
         p->state = RUNNABLE;
         p->next = NULL;
         addToRunnable(p);
-        printf("Sema realased ");
+        printString("Sema realased ");
     }
 }
 

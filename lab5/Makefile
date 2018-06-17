@@ -4,7 +4,8 @@ os.img:
 	@cd bootloader; make
 	@cd kernel; make
 	@cd app; make
-	cat bootloader/bootloader.bin kernel/kMain.elf app/uMain.elf > os.img
+	@gcc utils/initFS.c -g -o utils/initFS
+	@./utils/initFS
 
 play: os.img
 	$(QEMU) -serial stdio os.img
@@ -16,4 +17,4 @@ clean:
 	@cd bootloader; make clean
 	@cd kernel; make clean
 	@cd app; make clean
-	rm -f os.img
+	rm -f os.img utils/initFS

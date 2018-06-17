@@ -10,7 +10,13 @@
 #define SYS_SEM_POST 6
 #define SYS_SEM_WAIT 7
 #define SYS_SEM_DESTROY 8
+#define SYS_LS 9
+#define SYS_OPEN 10
+#define SYS_FWRITE 11
+#define SYS_CAT 12
+#define SYS_CLOSE 13
 #define NULL 0
+
 /*
  * io lib here
  * 库函数写在这
@@ -145,4 +151,24 @@ uint32_t sem_wait(sem_t *sem) {
 
 uint32_t sem_destroy(sem_t *sem) {
 	return syscall(SYS_SEM_DESTROY ,(uint32_t)sem, 0, 0, 0, 0);
+}
+
+void ls(const char *dirName) {
+	syscall(SYS_LS, (uint32_t)dirName, 0, 0, 0, 0);
+}
+
+uint32_t open(const char *fileName, int priority) {
+	return syscall(SYS_OPEN, (uint32_t)fileName, priority, 0, 0, 0);
+}
+
+uint32_t write(int fd, void *src, int size) {
+	return syscall(SYS_FWRITE, fd, (uint32_t)src, size, 0, 0);
+}
+
+void close(int fd) {
+	syscall(SYS_CLOSE, fd, 0, 0, 0, 0);
+}
+
+void cat(const char *fileName) {
+	syscall(SYS_CAT, (uint32_t)fileName, 0, 0, 0, 0);
 }
