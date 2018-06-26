@@ -22,9 +22,9 @@ ELF Header:
 Section Headers:
   [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
   [ 0]                   NULL            00000000 000000 000000 00      0   0  0
-  [ 1] .text             PROGBITS        00100000 001000 00283a 00  AX  0   0  4
-  [ 2] .rodata           PROGBITS        0010283c 00383c 000110 00   A  0   0  4
-  [ 3] .eh_frame         PROGBITS        0010294c 00394c 000c00 00   A  0   0  4
+  [ 1] .text             PROGBITS        00100000 001000 002832 00  AX  0   0  4
+  [ 2] .rodata           PROGBITS        00102834 003834 000110 00   A  0   0  4
+  [ 3] .eh_frame         PROGBITS        00102944 003944 000c00 00   A  0   0  4
   [ 4] .data             PROGBITS        00104560 004560 000100 00  WA  0   0 32
   [ 5] .bss              NOBITS          00104660 004660 281934 00  WA  0   0 32
   [ 6] .comment          PROGBITS        00000000 004660 000034 01  MS  0   0  1
@@ -40,7 +40,7 @@ There are no section groups in this file.
 
 Program Headers:
   Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
-  LOAD           0x001000 0x00100000 0x00100000 0x0354c 0x0354c R E 0x1000
+  LOAD           0x001000 0x00100000 0x00100000 0x03544 0x03544 R E 0x1000
   LOAD           0x004560 0x00104560 0x00104560 0x00100 0x281a34 RW  0x1000
   GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
 
@@ -60,8 +60,8 @@ Symbol table '.symtab' contains 133 entries:
    Num:    Value  Size Type    Bind   Vis      Ndx Name
      0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
      1: 00100000     0 SECTION LOCAL  DEFAULT    1 
-     2: 0010283c     0 SECTION LOCAL  DEFAULT    2 
-     3: 0010294c     0 SECTION LOCAL  DEFAULT    3 
+     2: 00102834     0 SECTION LOCAL  DEFAULT    2 
+     3: 00102944     0 SECTION LOCAL  DEFAULT    3 
      4: 00104560     0 SECTION LOCAL  DEFAULT    4 
      5: 00104660     0 SECTION LOCAL  DEFAULT    5 
      6: 00000000     0 SECTION LOCAL  DEFAULT    6 
@@ -87,7 +87,7 @@ Symbol table '.symtab' contains 133 entries:
     26: 00100028    31 FUNC    GLOBAL DEFAULT    1 strcpy
     27: 00105000 0x200d00 OBJECT  GLOBAL DEFAULT    5 processTable
     28: 00100838    90 FUNC    GLOBAL DEFAULT    1 sysOpen
-    29: 00102803     0 NOTYPE  GLOBAL DEFAULT    1 irqEmpty
+    29: 001027fb     0 NOTYPE  GLOBAL DEFAULT    1 irqEmpty
     30: 00100da4    42 FUNC    GLOBAL DEFAULT    1 printString
     31: 00305d20     4 OBJECT  GLOBAL DEFAULT    5 blockBitmap
     32: 00100894    93 FUNC    GLOBAL DEFAULT    1 sysFwrite
@@ -99,39 +99,39 @@ Symbol table '.symtab' contains 133 entries:
     38: 001046c0   128 OBJECT  GLOBAL DEFAULT    5 semaphoreTable
     39: 00100658   183 FUNC    GLOBAL DEFAULT    1 sysSemWait
     40: 00100218    37 FUNC    GLOBAL DEFAULT    1 memcpy
-    41: 001026b0   186 FUNC    GLOBAL DEFAULT    1 cat
+    41: 001026a8   186 FUNC    GLOBAL DEFAULT    1 cat
     42: 00101000   117 FUNC    GLOBAL DEFAULT    1 readSect
     43: 0010466c     4 OBJECT  GLOBAL DEFAULT    5 endOfSem
     44: 00101b38   133 FUNC    GLOBAL DEFAULT    1 initFS
     45: 00104f40    56 OBJECT  GLOBAL DEFAULT    5 gdt
     46: 00101078   117 FUNC    GLOBAL DEFAULT    1 writeSect
     47: 00305d28     4 OBJECT  GLOBAL DEFAULT    5 super
-    48: 00102104    40 FUNC    GLOBAL DEFAULT    1 initFcbTable
+    48: 001020fc    40 FUNC    GLOBAL DEFAULT    1 initFcbTable
     49: 00305d00     4 OBJECT  GLOBAL DEFAULT    5 blocked
     50: 001007a8    75 FUNC    GLOBAL DEFAULT    1 sysList
     51: 0010031c    93 FUNC    GLOBAL DEFAULT    1 sysWrite
     52: 00101998    91 FUNC    GLOBAL DEFAULT    1 schedule
-    53: 0010276c   151 FUNC    GLOBAL DEFAULT    1 abort
+    53: 00102764   151 FUNC    GLOBAL DEFAULT    1 abort
     54: 001014c4   363 FUNC    GLOBAL DEFAULT    1 enterProcessSpace
     55: 00100dd0   208 FUNC    GLOBAL DEFAULT    1 printDemical
     56: 00305d40    50 OBJECT  GLOBAL DEFAULT    5 pathBuf
     57: 00305d80    50 OBJECT  GLOBAL DEFAULT    5 pathBuf2
     58: 00104f80   100 OBJECT  GLOBAL DEFAULT    5 tss
-    59: 00102404   683 FUNC    GLOBAL DEFAULT    1 write
+    59: 001023fc   683 FUNC    GLOBAL DEFAULT    1 write
     60: 00101690    93 FUNC    GLOBAL DEFAULT    1 updateTime
     61: 001003d8   244 FUNC    GLOBAL DEFAULT    1 sysFork
-    62: 00102816     0 NOTYPE  GLOBAL DEFAULT    1 irqTimer
+    62: 0010280e     0 NOTYPE  GLOBAL DEFAULT    1 irqTimer
     63: 00101294   221 FUNC    GLOBAL DEFAULT    1 loadUMain
     64: 00100fb8    27 FUNC    GLOBAL DEFAULT    1 putChar
     65: 00305dc0    50 OBJECT  GLOBAL DEFAULT    5 buf1
-    66: 00101f20    83 FUNC    GLOBAL DEFAULT    1 applyNewInode
+    66: 00101f18    83 FUNC    GLOBAL DEFAULT    1 applyNewInode
     67: 00100c54   111 FUNC    GLOBAL DEFAULT    1 V
     68: 00101374   326 FUNC    GLOBAL DEFAULT    1 initNewPCB
     69: 00305e00    50 OBJECT  GLOBAL DEFAULT    5 buf2
     70: 00101c68   375 FUNC    GLOBAL DEFAULT    1 findFile
     71: 001014bc     7 FUNC    GLOBAL DEFAULT    1 idle
-    72: 00102208   508 FUNC    GLOBAL DEFAULT    1 read
-    73: 0010280d     0 NOTYPE  GLOBAL DEFAULT    1 irqSyscall
+    72: 00102200   508 FUNC    GLOBAL DEFAULT    1 read
+    73: 00102805     0 NOTYPE  GLOBAL DEFAULT    1 irqSyscall
     74: 00305e40   192 OBJECT  GLOBAL DEFAULT    5 fcbTable
     75: 00305d04     4 OBJECT  GLOBAL DEFAULT    5 current
     76: 00100a5c   152 FUNC    GLOBAL DEFAULT    1 irqHandle
@@ -154,13 +154,13 @@ Symbol table '.symtab' contains 133 entries:
     93: 00305d08     4 OBJECT  GLOBAL DEFAULT    5 runnable
     94: 00100000    38 FUNC    GLOBAL DEFAULT    1 kEntry
     95: 0010126c    39 FUNC    GLOBAL DEFAULT    1 enterUserSpace
-    96: 00102058    83 FUNC    GLOBAL DEFAULT    1 applyNewBlock
+    96: 00102050    83 FUNC    GLOBAL DEFAULT    1 applyNewBlock
     97: 00100b40    18 FUNC    GLOBAL DEFAULT    1 sysClose
-    98: 001020ac    85 FUNC    GLOBAL DEFAULT    1 appleNewFCB
+    98: 001020a4    85 FUNC    GLOBAL DEFAULT    1 appleNewFCB
     99: 001000b8    70 FUNC    GLOBAL DEFAULT    1 strcspn
-   100: 00102809     0 NOTYPE  GLOBAL DEFAULT    1 irqGProtectFault
+   100: 00102801     0 NOTYPE  GLOBAL DEFAULT    1 irqGProtectFault
    101: 00101bc0   166 FUNC    GLOBAL DEFAULT    1 splitFileName
-   102: 00101f74   226 FUNC    GLOBAL DEFAULT    1 mkfile
+   102: 00101f6c   226 FUNC    GLOBAL DEFAULT    1 mkfile
    103: 00100ea0   126 FUNC    GLOBAL DEFAULT    1 printHex
    104: 001016f0   398 FUNC    GLOBAL DEFAULT    1 checkRunnableList
    105: 00100264    35 FUNC    GLOBAL DEFAULT    1 GProtectFaultHandle
@@ -172,23 +172,23 @@ Symbol table '.symtab' contains 133 entries:
    111: 00100558    98 FUNC    GLOBAL DEFAULT    1 sysSemInit
    112: 001005bc   156 FUNC    GLOBAL DEFAULT    1 sysSemPost
    113: 0010037c    33 FUNC    GLOBAL DEFAULT    1 writeVMem
-   114: 00101de0   317 FUNC    GLOBAL DEFAULT    1 ls
+   114: 00101de0   309 FUNC    GLOBAL DEFAULT    1 ls
    115: 00100710   150 FUNC    GLOBAL DEFAULT    1 sysSemDestroy
    116: 00101660    48 FUNC    GLOBAL DEFAULT    1 addToRunnable
    117: 00305d10     4 OBJECT  GLOBAL DEFAULT    5 eblocked
-   118: 0010281c     0 NOTYPE  GLOBAL DEFAULT    1 asmDoIrq
+   118: 00102814     0 NOTYPE  GLOBAL DEFAULT    1 asmDoIrq
    119: 001004cc   107 FUNC    GLOBAL DEFAULT    1 sysSleep
    120: 00100100    79 FUNC    GLOBAL DEFAULT    1 strspn
    121: 00385f40     4 OBJECT  GLOBAL DEFAULT    5 inodeBitmap
    122: 00385f60    50 OBJECT  GLOBAL DEFAULT    5 fileBuf
-   123: 0010212c   171 FUNC    GLOBAL DEFAULT    1 open
+   123: 00102124   171 FUNC    GLOBAL DEFAULT    1 open
    124: 0010007c    60 FUNC    GLOBAL DEFAULT    1 strchr
    125: 00100538    32 FUNC    GLOBAL DEFAULT    1 sysExit
    126: 00104680     4 OBJECT  GLOBAL DEFAULT    5 endOfPCB
    127: 00100b54   132 FUNC    GLOBAL DEFAULT    1 initNewSem
    128: 00100fec    18 FUNC    GLOBAL DEFAULT    1 waitDisk
    129: 00100bd8   123 FUNC    GLOBAL DEFAULT    1 P
-   130: 001021d8    46 FUNC    GLOBAL DEFAULT    1 close
+   130: 001021d0    46 FUNC    GLOBAL DEFAULT    1 close
    131: 001008f4   359 FUNC    GLOBAL DEFAULT    1 syscallHandle
    132: 00104668     4 OBJECT  GLOBAL DEFAULT    5 row
 

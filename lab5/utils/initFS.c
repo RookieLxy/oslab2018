@@ -44,36 +44,10 @@ int main() {
     mkdir("/usr");
     mkfile("/dev/stdin");
     mkfile("/dev/stdout");
-    /*
-    int fd = open("/usr/test", 0);  // 创建文件"/usr/test"
-    for(int i = 0; i < 512; ++i) {               // 向"/usr/test"文件中写入字母表
-        char tmp = (char)(i % 26 + 'A');
-        write(fd, (uint8_t*)&tmp, 1);
-    }
-    close(fd);
-    char temp[512];
-    fd = open("/usr/test", 0);
-    read(fd, temp, 512);
-    for(int i = 0; i < 512; ++i) {
-        printf("%c", temp[i]);
-    }
-    printf("\n");
-    */
-    
+     
     int fd = open("/sbin/init", 0);
     write(fd, appBuf, appSize*sizeof(block));
     close(fd);
-    /*
-    fd = open("/sbin/init", 0);
-    block *appBuf2 = (block *)malloc(appSize*sizeof(block));
-    read(fd, appBuf2, appSize*sizeof(block));
-    for(int i = 0; i < appSize; ++i) {
-        for(int j = 0; j < sizeof(block); ++j) {
-            printf("%x", appBuf2[i][j]);
-        }
-        printf("\n");
-    }
-    */
     
     fp = fopen("os.img", "wb");
     fwrite(disk, sizeof(block), DISK_BLOCK, fp);
